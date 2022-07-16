@@ -21,18 +21,18 @@ train_Activity <- read.table('./UCI HAR Dataset/train/y_train.txt', header=FALSE
 train_Subjects <- read.table('./UCI HAR Dataset/train/subject_train.txt', header=FALSE)
 
 # get test data and subject
-test_Values <- read.table("./UCI HAR Dataset/test/X_test.txt", header=FALSE)
-test_Activity <- read.table("./UCI HAR Dataset/test/y_test.txt", header=FALSE)
-test_Subjects <-read.table("./UCI HAR Dataset/test/subject_test.txt", header=FALSE)
+test_Values <- read.table('./UCI HAR Dataset/test/X_test.txt', header=FALSE)
+test_Activity <- read.table('./UCI HAR Dataset/test/y_test.txt', header=FALSE)
+test_Subjects <-read.table('./UCI HAR Dataset/test/subject_test.txt', header=FALSE)
 
 # get features data
-features <- read.table("./UCI HAR Dataset/features.txt", header=FALSE)
+features <- read.table('./UCI HAR Dataset/features.txt', header=FALSE)
 
 # get activity data
-activity <- read.table("./UCI HAR Dataset/activity_labels.txt", header=FALSE)
+activities <- read.table('./UCI HAR Dataset/activity_labels.txt', header=FALSE)
 
 # rename activity columns to id and actions(walk,lay,etc.)
-colnames(activity) <- c("activityId","activityLabel")
+colnames(activities) <- c("activityId","activityLabel")
 
 
 # 1. Merges the training and the test sets to create one data set
@@ -61,14 +61,14 @@ colnames(my_dataset) <- c("subject", features[, 2], "activity")
 columns_names <- colnames(my_dataset)
 
 my_dataset2 <- my_dataset %>%
-                select(subject, activity, grep("\\bmean\\b|\\bstd\\b",columns_names))
+                select(subject, activity, grep("\\bmean\\b|\\bstd\\b", columns_names))
 
 
 # 3. Use descriptive activity names to name the activities in the data set
 
-## transform activity to a factor variable
-
-my_dataset2$activity <- as.factor(my_dataset2$activity)
+##replace activity values with named factor levels
+my_dataset2$activity <- factor(my_dataset2$activity, 
+                                 levels = activities[, 1], labels = activities[, 2])
 
 # 4. Appropriately label the data set with descriptive variable names
 
@@ -80,7 +80,7 @@ colnames(my_dataset2) <- gsub("Mag", "Magnitude", colnames(my_dataset2))
 colnames(my_dataset2) <- gsub("Freq", "Frequency", colnames(my_dataset2))
 colnames(my_dataset2) <- gsub("mean", "Mean", colnames(my_dataset2))
 colnames(my_dataset2) <- gsub("std", "StandardDeviation", colnames(my_dataset2))
-colnames(my_dataset2) < -gsub("BodyBody", "Body", colnames(my_dataset2))
+
 
 # 5. Create a second, independent tidy set with the average of each variable for each activity and each subject
 
@@ -92,5 +92,4 @@ my_dataset_Means <- my_dataset2 %>%
 ### text file for final output
 
 write.table(my_dataset_Means, "tidy_data.txt", row.names = FALSE, quote = FALSE)
-
 
